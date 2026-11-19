@@ -16,6 +16,6 @@ public class BusElectrico extends Vehiculo {
 
     @Override
     public double calcularCostoRecorrido(double distanciaKm) {
-        return distanciaKm * consumoKwhPorKm * PRECIO_KWH;
+        return Math.round(distanciaKm * consumoKwhPorKm * PRECIO_KWH * 100) / 100.0;
     }
 }
