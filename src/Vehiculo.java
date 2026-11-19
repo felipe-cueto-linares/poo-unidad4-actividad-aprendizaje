@@ -1,6 +1,7 @@
 public abstract class Vehiculo {
     protected String placa;
     protected int capacidad;
+    private Ruta ruta;
 
     public Vehiculo(String placa, int capacidad) {
         if (placa == null || placa.isBlank()) {
@@ -19,6 +20,14 @@ public abstract class Vehiculo {
 
     public int getCapacidad() {
         return capacidad;
+    }
+
+    public Ruta getRuta() {
+        return ruta;
+    }
+
+    public void setRuta(Ruta ruta) {
+        this.ruta = ruta;
     }
 
     public abstract double calcularCostoRecorrido(double distanciaKm);
