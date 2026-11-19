@@ -1,0 +1,145 @@
+@startuml
+skinparam classAttributeIconSize 0
+title Plataforma de transporte urbano
+
+class EmpresaTransporte {
+  - nit: String
+  - nombre: String
+  + EmpresaTransporte(nit: String, nombre: String)
+  + getNit(): String
+  + getNombre(): String
+  + setNombre(nombre: String): void
+  + agregarRuta(ruta: Ruta): void
+  + agregarVehiculo(vehiculo: Vehiculo): void
+  + costoTotalOperacion(): double
+}
+
+class Ruta {
+  - codigo: String
+  - nombre: String
+  + Ruta(codigo: String, nombre: String)
+  + getCodigo(): String
+  + getNombre(): String
+  + agregarParada(estacion: Estacion, posicion: int, tiempoDesdeAnterior: int, distanciaAcumulada: double): ParadaRuta
+  + distanciaTotal(): double
+  + tiempoTotal(): int
+}
+
+class Estacion {
+  - codigo: String
+  - nombre: String
+  - direccion: String
+  + Estacion(codigo: String, nombre: String, direccion: String)
+  + getCodigo(): String
+  + getNombre(): String
+  + getDireccion(): String
+  + setDireccion(direccion: String): void
+}
+
+class EstacionTransferencia {
+  - tiempoTransbordo: int
+  + EstacionTransferencia(codigo: String, nombre: String, direccion: String, tiempoTransbordo: int)
+  + getTiempoTransbordo(): int
+  + rutasConectadas(): List<Ruta>
+}
+
+class ParadaRuta {
+  - posicion: int
+  - tiempoDesdeAnterior: int
+  - distanciaAcumulada: double
+  + ParadaRuta(ruta: Ruta, estacion: Estacion, posicion: int, tiempoDesdeAnterior: int, distanciaAcumulada: double)
+  + getPosicion(): int
+  + getTiempoDesdeAnterior(): int
+  + getDistanciaAcumulada(): double
+}
+
+abstract class Vehiculo {
+  # placa: String
+  # capacidad: int
+  + Vehiculo(placa: String, capacidad: int)
+  + getPlaca(): String
+  + getCapacidad(): int
+  + {abstract} calcularCostoRecorrido(distanciaKm: double): double
+}
+
+class BusConvencional {
+  - rendimientoKmPorGalon: double
+  + calcularCostoRecorrido(distanciaKm: double): double
+}
+
+class BusElectrico {
+  - consumoKwhPorKm: double
+  + calcularCostoRecorrido(distanciaKm: double): double
+}
+
+class VehiculoArticulado {
+  - numeroSecciones: int
+  + calcularCostoRecorrido(distanciaKm: double): double
+}
+
+class Conductor {
+  - documento: String
+  - nombre: String
+  - numeroLicencia: String
+  + Conductor(documento: String, nombre: String, numeroLicencia: String)
+  + getDocumento(): String
+  + getNombre(): String
+  + getNumeroLicencia(): String
+}
+
+class AsignacionTurno {
+  - fecha: LocalDate
+  - horaInicio: LocalTime
+  - horaFin: LocalTime
+  + AsignacionTurno(conductor: Conductor, vehiculo: Vehiculo, fecha: LocalDate, horaInicio: LocalTime, horaFin: LocalTime)
+  + duracionHoras(): double
+}
+
+class Usuario {
+  - documento: String
+  - nombre: String
+  + Usuario(documento: String, nombre: String)
+  + getDocumento(): String
+  + getNombre(): String
+  + agregarMedioPago(medio: MedioPago): void
+  + ingresarPor(estacion: Estacion, medio: MedioPago, tarifa: double): boolean
+}
+
+interface MedioPago {
+  + procesarPago(monto: double): boolean
+}
+
+class TarjetaPrepago {
+  - numero: String
+  - saldo: double
+  + TarjetaPrepago(numero: String, saldo: double)
+  + getSaldo(): double
+  + recargar(monto: double): void
+  + procesarPago(monto: double): boolean
+}
+
+class BilleteraDigital {
+  - proveedor: String
+  - saldo: double
+  - limiteDiario: double
+  + BilleteraDigital(proveedor: String, saldo: double, limiteDiario: double)
+  + getSaldo(): double
+  + procesarPago(monto: double): boolean
+}
+
+EmpresaTransporte "1" --> "1..*" Ruta : opera
+EmpresaTransporte "1" o-- "0..*" Vehiculo : dispone de
+Vehiculo "0..*" --> "0..1" Ruta : recorre
+Ruta "1..*" -- "2..*" Estacion
+(Ruta, Estacion) .. ParadaRuta
+Estacion <|-- EstacionTransferencia
+Vehiculo <|-- BusConvencional
+Vehiculo <|-- BusElectrico
+Vehiculo <|-- VehiculoArticulado
+Conductor "0..*" -- "0..*" Vehiculo
+(Conductor, Vehiculo) .. AsignacionTurno
+Usuario "1" --> "0..*" MedioPago : utiliza
+MedioPago <|.. TarjetaPrepago
+MedioPago <|.. BilleteraDigital
+Usuario ..> Estacion : ingresa por
+@enduml
